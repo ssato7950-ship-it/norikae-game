@@ -83,6 +83,11 @@
   var $ = function(id){ return document.getElementById(id); };
   var rnd = function(a,b){ return a + Math.random()*(b-a); };
 
+  /* 計測用。analytics.js が受け取る。読み込んでいなければ何も起きない */
+  function ev(name, props){
+    try{ document.dispatchEvent(new CustomEvent('nk-ev', {detail:{name:name, props:props||{}}})); }catch(_){}
+  }
+
   function pad(n){ return (n<10?'0':'')+n; }
   function clock(t){ t=Math.floor(t); return pad(Math.floor(t/3600)%24)+':'+pad(Math.floor(t/60)%60)+':'+pad(t%60); }
   function mmss(sec){ sec=Math.max(0,Math.floor(sec)); return Math.floor(sec/60)+':'+pad(sec%60); }
@@ -332,7 +337,11 @@
 
   /* ===== モード選択・駅選択 ===== */
   Array.prototype.forEach.call(document.querySelectorAll('[data-mode]'), function(b){
-    b.addEventListener('click', function(){ currentMode = b.getAttribute('data-mode'); showStationList(); });
+    b.addEventListener('click', function(){
+      currentMode = b.getAttribute('data-mode');
+      ev('mode_select', {mode:currentMode});
+      showStationList();
+    });
   });
   $('btnModeBack').addEventListener('click', function(){ show('scMode'); renderStats(); });
 
@@ -397,6 +406,7 @@
       delay:0, car:0, elapsed:null,
       layout:makeLayout(), npcs:[], usedLower:null, usedUpper:null, escWait:0, done:false
     };
+    ev('play_start', {mode:currentMode, level:station.level, station:station.id, crowd:crowd.label});
     buildWalk();
     spawnWaiting();
     setBoardTag(station.toLine);
@@ -621,6 +631,7 @@
     cancelAnimationFrame(raf);
     var station = S.station;
     var title = $('rTitle');
+    var endProps = {mode:S.mode, level:station.level, station:station.id};
     var rows = [
       ['駅', station.from+' → '+station.to+'（Lv.'+station.level+'）'],
       ['混み具合', S.crowd.label],
@@ -644,6 +655,8 @@
         ? 'タイム '+elapsed.toFixed(1)+'秒。自己ベストを更新しました！'
         : 'タイム '+elapsed.toFixed(1)+'秒。自己ベストは'+best.toFixed(1)+'秒です。';
       rows.unshift(['タイム', elapsed.toFixed(1)+'秒'], ['自己ベスト', (isRecord?elapsed:best).toFixed(1)+'秒']);
+      endProps.result = 'goal';
+      endProps.seconds = Math.round(elapsed);
     }else{
       if(!ok) S.time = Math.max(S.time, S.depart);
       renderBoard();
@@ -652,6 +665,10 @@
       r.play++;
       if(ok){ r.win++; if(r.best == null || margin > r.best) r.best = margin; }
       st[station.id] = r; saveJSON(STAT_KEY, st);
+
+      endProps.result = ok ? 'win' : 'lose';
+      endProps.margin = margin;
+      if(!ok) endProps.zone = zoneOf(S.p.y);   // どこで間に合わなくなったか
 
       if(ok){
         title.className = 'result-title ok';
@@ -669,12 +686,19 @@
           : station.fromLine.name+'のホームにいる間に、'+station.toLine.name+'が発車しました。';
       }
     }
+    ev('play_end', endProps);
     $('rDetail').innerHTML = rows.map(function(x){ return '<dt>'+x[0]+'</dt><dd>'+x[1]+'</dd>'; }).join('');
     setTimeout(function(){ show('scResult'); $('btnRetry').focus(); }, (S.mode==='trial'||ok) ? 500 : 900);
   }
 
-  $('btnRetry').addEventListener('click', function(){ startGame(S.station.id); });
-  $('btnTop').addEventListener('click', function(){ S = null; renderBoard(); renderStats(); show('scMode'); });
+  $('btnRetry').addEventListener('click', function(){
+    ev('retry', {mode:S.mode, level:S.station.level, station:S.station.id});
+    startGame(S.station.id);
+  });
+  $('btnTop').addEventListener('click', function(){
+    ev('back_to_top', {mode:S.mode, level:S.station.level});
+    S = null; renderBoard(); renderStats(); show('scMode');
+  });
 
   renderBoard();
   renderStats();

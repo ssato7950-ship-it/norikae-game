@@ -1,9 +1,10 @@
-var CACHE = 'norikae-transfer-v2';
+var CACHE = 'norikae-transfer-v3';
 var ASSETS = [
   './',
   './index.html',
   './style.css',
   './script.js',
+  './analytics.js',
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png',
