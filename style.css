@@ -1,0 +1,124 @@
+:root{
+  --bg:#E3E6DF; --surface:#F7F8F4; --ink:#1E2328; --muted:#58616A; --line:#C7CCC3;
+  --board:#1B2430; --led:#FFB23F; --led-dim:#8A6A35; --led-alert:#FF6A55;
+  --ok:#2E8B4B; --ng:#C8423A;
+  --btn:#1E2328; --btn-ink:#FFFFFF; --focus:#2F6FD6;
+  --map-wall:#AEB4AB; --map-floor:#D6DAD1; --map-floor2:#EEF0EA; --map-gate:#4E565E;
+  --map-outside:#C3C8BF; --map-stairs:#C2C8BD; --map-stairs-line:#858E80; --map-esc:#627388;
+  --map-arrow:#FFFFFF; --map-pillar:#858E80; --person:#59626B; --me:#1F63D6; --me-ring:#FFFFFF;
+  --map-label:#4E565E; --door:#FFFFFF;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14181C; --surface:#1E242A; --ink:#E8EBE5; --muted:#A2AAB1; --line:#353D45;
+    --board:#0B1016; --btn:#E8EBE5; --btn-ink:#14181C; --focus:#7FB0FF;
+    --map-wall:#0D1115; --map-floor:#2A3138; --map-floor2:#222930; --map-gate:#A2AAB1;
+    --map-outside:#181D22; --map-stairs:#3A434B; --map-stairs-line:#5E6871; --map-esc:#4B5C70;
+    --map-arrow:#E8EBE5; --map-pillar:#4A535B; --person:#9AA3AB; --me:#7FB0FF; --me-ring:#0B1016;
+    --map-label:#A2AAB1; --door:#E8EBE5;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14181C; --surface:#1E242A; --ink:#E8EBE5; --muted:#A2AAB1; --line:#353D45;
+  --board:#0B1016; --btn:#E8EBE5; --btn-ink:#14181C; --focus:#7FB0FF;
+  --map-wall:#0D1115; --map-floor:#2A3138; --map-floor2:#222930; --map-gate:#A2AAB1;
+  --map-outside:#181D22; --map-stairs:#3A434B; --map-stairs-line:#5E6871; --map-esc:#4B5C70;
+  --map-arrow:#E8EBE5; --map-pillar:#4A535B; --person:#9AA3AB; --me:#7FB0FF; --me-ring:#0B1016;
+  --map-label:#A2AAB1; --door:#E8EBE5;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:'BIZ UDPGothic','Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,sans-serif;
+  font-size:17px; line-height:1.65; -webkit-text-size-adjust:100%;
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+}
+.wrap{max-width:480px; margin:0 auto; padding:10px 12px 28px}
+
+/* 発車標 */
+.board{
+  background:var(--board); border-radius:10px; padding:8px 12px;
+  font-family:'DotGothic16','BIZ UDPGothic',sans-serif; color:var(--led);
+  box-shadow:inset 0 0 0 3px #2B3542;
+}
+.board-row{display:flex; align-items:center; gap:10px; font-size:20px; line-height:1.4}
+.board-row + .board-row{margin-top:2px}
+.tag{font-family:'BIZ UDPGothic',sans-serif; font-weight:700; font-size:14px; color:#fff;
+  background:var(--muted); padding:1px 8px; border-radius:4px; white-space:nowrap}
+.grow{flex:1}
+.dim{color:var(--led-dim); font-size:15px}
+.left-big{font-size:30px; line-height:1.1}
+.board.alert .left-big{color:var(--led-alert)}
+@media (prefers-reduced-motion: no-preference){
+  .board.alert .left-big{animation:blink 1s steps(2,start) infinite}
+}
+@keyframes blink{to{visibility:hidden}}
+
+h1{font-size:26px; line-height:1.3; margin:20px 0 6px}
+h2{font-size:20px; line-height:1.35; margin:16px 0 8px}
+p{margin:0 0 10px}
+.muted{color:var(--muted); font-size:15px}
+.panel{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:12px 14px; margin:10px 0}
+.route{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:4px 0}
+.hidden{display:none !important}
+
+button{font:inherit; color:inherit; cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent}
+button:focus-visible{outline:3px solid var(--focus); outline-offset:2px}
+.choice{display:block; width:100%; text-align:left; background:var(--surface);
+  border:2px solid var(--line); border-radius:8px; padding:10px 14px; margin:8px 0}
+.choice strong{display:block; font-size:18px}
+.choice span{color:var(--muted); font-size:15px}
+.choice:active{border-color:var(--ink)}
+.primary{display:block; width:100%; background:var(--btn); color:var(--btn-ink);
+  border:0; border-radius:8px; padding:14px; font-size:18px; font-weight:700; margin:10px 0}
+.secondary{display:block; width:100%; background:transparent; border:2px solid var(--ink);
+  border-radius:8px; padding:12px; font-size:17px; margin:8px 0}
+
+.cars{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:8px 0}
+.car{background:var(--muted); color:#fff; border:0; border-radius:6px; padding:12px 0; font-weight:700; font-size:17px}
+.car:active{filter:brightness(.9)}
+
+/* 駅（レベル）選択 */
+.tier-heading{font-size:15px; color:var(--muted); margin:18px 0 6px; padding-top:6px; border-top:1px solid var(--line)}
+.tier-heading:first-of-type{border-top:0; margin-top:10px}
+.station-btn{display:flex; flex-wrap:wrap; align-items:center; width:100%; text-align:left;
+  background:var(--surface); border:2px solid var(--line); border-radius:8px; padding:10px 14px; margin:8px 0; gap:6px 10px}
+.station-btn:active{border-color:var(--ink)}
+.level-badge{background:var(--ink); color:var(--bg); font-size:12px; font-weight:700; padding:2px 7px; border-radius:10px}
+.station-name{font-size:17px; font-weight:700; flex:1}
+.line-tags{display:flex; gap:6px; width:100%}
+.line-tags .tag{background:var(--muted)}
+.station-sub{width:100%; color:var(--muted); font-size:13px}
+
+/* 地図 */
+.map{display:block; width:100%; margin:0 auto; border-radius:8px; touch-action:none;
+  max-width:min(100%, calc((100vh - 190px) * 0.8)); }
+@supports (height:100svh){ .map{max-width:min(100%, calc((100svh - 190px) * 0.8))} }
+.legend{display:flex; flex-wrap:wrap; gap:4px 14px; font-size:13px; color:var(--muted); margin:6px 0 0; justify-content:center}
+.legend i{display:inline-block; width:14px; height:14px; vertical-align:-2px; margin-right:4px; border-radius:3px}
+.sw-stairs{background:repeating-linear-gradient(180deg,var(--map-stairs) 0 3px,var(--map-stairs-line) 3px 4px)}
+.sw-esc{background:var(--map-esc)}
+.sw-person{background:var(--person); border-radius:50% !important}
+.sw-me{background:var(--me); border-radius:50% !important; box-shadow:0 0 0 2px var(--me-ring) inset}
+.sw-gate{background:var(--map-gate); width:5px !important}
+.msg{min-height:3.2em; margin:8px 0 4px; font-size:16px; line-height:1.5}
+.msg.warn{color:var(--ng); font-weight:700}
+
+/* 乗車中 */
+.stations{display:flex; justify-content:space-between; position:relative; margin:18px 4px 8px}
+.stations-bar{position:absolute; left:8px; right:8px; top:8px; height:6px; border-radius:3px}
+.st{position:relative; text-align:center; font-size:13px; width:20%}
+.st i{display:block; width:22px; height:22px; margin:0 auto 4px; border-radius:50%; background:var(--surface); border:4px solid var(--line)}
+.st.now i{background:var(--ink) !important; border-color:var(--ink) !important}
+.log{list-style:none; padding:0; margin:0; font-size:15px}
+.log li{padding:6px 0; border-bottom:1px dashed var(--line)}
+.log li:last-child{border-bottom:0}
+
+.result-title{font-size:30px; line-height:1.3; margin:18px 0 6px}
+.result-title.ok{color:var(--ok)}
+.result-title.ng{color:var(--ng)}
+dl.detail{display:grid; grid-template-columns:auto 1fr; gap:6px 14px; margin:0; font-size:15px}
+dl.detail dt{color:var(--muted)}
+dl.detail dd{margin:0}
+.note{font-size:13px; color:var(--muted); margin-top:16px}

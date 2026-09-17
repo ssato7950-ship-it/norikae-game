@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>電車 乗り換えチャレンジ</title>
+<meta name="theme-color" content="#1B2430">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="乗り換え">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=DotGothic16&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="board" id="board">
+    <div class="board-row">
+      <span class="tag" id="bTag">—</span>
+      <span class="grow">発車</span>
+      <span id="bDepart">--:--:--</span>
+    </div>
+    <div class="board-row">
+      <span class="dim">いま</span><span class="dim grow" id="bNow">--:--:--</span>
+      <span class="dim" id="bLeftLabel">発車まで</span><span class="left-big" id="bLeft">-:--</span>
+    </div>
+  </div>
+
+  <!-- モード選択 -->
+  <section id="scMode">
+    <h1>電車 乗り換えチャレンジ</h1>
+    <p>好きな駅を選んで、時間内に反対のホームまで走り抜けよう。むずかしさは駅ごとにレベル1〜50。まずは首都圏の駅から挑戦しよう（将来、主要都市の駅も追加予定）。</p>
+    <h2>モードを選んでください</h2>
+    <button class="choice" data-mode="normal"><strong>通常モード</strong><span>発車までに乗り換えられるか勝負。間に合わないと失敗です。</span></button>
+    <button class="choice" data-mode="trial"><strong>タイムトライアル</strong><span>発車を気にせず、乗り換えにかかった時間で自己ベストを目指します。</span></button>
+    <p class="muted" id="stats"></p>
+    <p class="note">駅名・路線名は実在のものを使っていますが、時刻・駅の中の配置・混み具合・遅れは、ゲーム用に作った例です。実際の時刻表や駅の構造とは異なります。</p>
+  </section>
+
+  <!-- 駅（レベル）選択 -->
+  <section id="scStation" class="hidden">
+    <h2 id="stationTitle">駅を選んでください</h2>
+    <button class="secondary" id="btnModeBack">← モードを選び直す</button>
+    <div id="stationList"></div>
+  </section>
+
+  <!-- 車両選び -->
+  <section id="scCar" class="hidden">
+    <h2 id="carTitle">何号車に乗りますか？</h2>
+    <p id="crowdInfo"></p>
+    <div id="previewBox">
+      <p class="muted">駅の地図です。下が乗ってきた電車、上が乗り換え先の電車です。</p>
+      <canvas class="map" id="preview" aria-label="駅の地図"></canvas>
+      <div class="legend">
+        <span><i class="sw-stairs"></i>階段</span>
+        <span><i class="sw-esc"></i>エスカレーター（矢印の向きに動く）</span>
+        <span><i class="sw-gate"></i>出口の改札</span>
+        <span><i class="sw-person"></i>人</span>
+      </div>
+    </div>
+    <p class="panel hidden" id="noMap">このレベルでは、地図は駅に着いてから見られます。勘で選んでください。</p>
+    <div class="cars" id="cars"></div>
+  </section>
+
+  <!-- 乗車中 -->
+  <section id="scRide" class="hidden">
+    <h2 id="rideTitle">乗っています</h2>
+    <div class="stations" id="stations"></div>
+    <div class="panel"><ul class="log" id="rideLog"></ul></div>
+    <button class="primary hidden" id="btnGetOff">ドアが開いたら降りる</button>
+  </section>
+
+  <!-- 乗り換え中 -->
+  <section id="scTransfer" class="hidden">
+    <p class="msg" id="tMsg"></p>
+    <canvas class="map" id="map" aria-label="駅の地図。行きたい場所をタッチすると歩きます"></canvas>
+    <div class="legend">
+      <span><i class="sw-me"></i>あなた</span>
+      <span><i class="sw-person"></i>人</span>
+      <span><i class="sw-stairs"></i>階段</span>
+      <span><i class="sw-esc"></i>エスカレーター</span>
+      <span><i class="sw-gate"></i>出口の改札</span>
+    </div>
+  </section>
+
+  <!-- 結果 -->
+  <section id="scResult" class="hidden">
+    <div class="result-title" id="rTitle"></div>
+    <p id="rText"></p>
+    <div class="panel"><dl class="detail" id="rDetail"></dl></div>
+    <button class="primary" id="btnRetry">もう一度</button>
+    <button class="secondary" id="btnTop">駅・モードを選び直す</button>
+  </section>
+
+</div>
+
+<script src="script.js"></script>
+<script>
+if('serviceWorker' in navigator){ window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); }); }
+</script>
+</body>
+</html>
