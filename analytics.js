@@ -2,7 +2,7 @@
    WEBSITE_ID が空のあいだは、通信も読み込みも一切行わない。
    計測をやめたいときは、index.html からこのファイルの読み込みを外すだけでよい。 */
 (function(){
-  var WEBSITE_ID = '';   // ← Umami Cloud で発行されたウェブサイトIDを貼る
+  var WEBSITE_ID = '6dfa63f0-515f-4709-881a-47f2fc34a260';   // Umami Cloud のウェブサイトID（公開前提の識別子。秘密情報ではない）
   var SRC = 'https://cloud.umami.is/script.js';
 
   if(!WEBSITE_ID) return;
