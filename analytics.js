@@ -15,6 +15,10 @@
 
   document.addEventListener('nk-ev', function(e){
     try{
+      // 自分のテストプレイを除外する。Umami標準の umami.disabled はページビューしか止めず、
+      // track() で送るイベントは素通りしてしまうため、ここで自前で見る
+      if(localStorage.getItem('umami.disabled')) return;
+
       var d = e.detail || {};
       if(!d.name) return;
       var props = {};
