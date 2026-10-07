@@ -95,16 +95,18 @@
 
   function show(id){
     ['scMode','scStation','scCar','scRide','scTransfer','scResult'].forEach(function(s){ $(s).classList.toggle('hidden', s!==id); });
+    $(id).scrollTop = 0;   // 画面ごとに内側でスクロールするので、切り替えたら先頭に戻す
     window.scrollTo(0,0);
   }
 
   function renderBoard(){
     if(!S){ $('bDepart').textContent='--:--:--'; $('bNow').textContent='--:--:--'; $('bLeftLabel').textContent='発車まで'; $('bLeft').textContent='-:--'; $('board').classList.remove('alert'); return; }
     $('bNow').textContent = clock(S.time);
-    if(S.mode === 'trial' && S.elapsed != null){
+    // タイムトライアルは発車時刻を使わない（歩き始める前も含めて、常に経過タイムを出す）
+    if(S.mode === 'trial'){
       $('bDepart').textContent = '——:——:——';
       $('bLeftLabel').textContent = '経過タイム';
-      $('bLeft').textContent = mmss(S.elapsed);
+      $('bLeft').textContent = mmss(S.elapsed || 0);
       $('board').classList.remove('alert');
       return;
     }
