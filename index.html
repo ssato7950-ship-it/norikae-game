@@ -105,7 +105,13 @@
 <script src="analytics.js"></script>
 <script src="script.js"></script>
 <script>
-if('serviceWorker' in navigator){ window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); }); }
+// 外部のゲーム投稿サイトではiframeで配信される。サンドボックス内では
+// navigator.serviceWorker に触れること自体が例外になるため、トップレベルのときだけ登録する
+try{
+  if(window.top === window.self && 'serviceWorker' in navigator){
+    window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+  }
+}catch(_){}
 </script>
 </body>
 </html>

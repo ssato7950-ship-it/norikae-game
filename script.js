@@ -123,8 +123,17 @@
 
   /* ===== 成績 ===== */
   var STAT_KEY = 'norikae-stats-v3', TRIAL_KEY = 'norikae-trial-v1';
-  function loadJSON(key){ try{ return JSON.parse(localStorage.getItem(key)) || {}; }catch(e){ return {}; } }
-  function saveJSON(key, v){ try{ localStorage.setItem(key, JSON.stringify(v)); }catch(e){} }
+  /* 外部のゲーム投稿サイトではiframe配信になり、ブラウザの設定によってはlocalStorageが使えない。
+     その場合でも、遊んでいる間だけは成績が残るようにメモリにも持っておく */
+  var memStore = {};
+  function loadJSON(key){
+    try{ return JSON.parse(localStorage.getItem(key)) || memStore[key] || {}; }
+    catch(e){ return memStore[key] || {}; }
+  }
+  function saveJSON(key, v){
+    memStore[key] = v;
+    try{ localStorage.setItem(key, JSON.stringify(v)); }catch(e){}
+  }
   function renderStats(){
     var st = loadJSON(STAT_KEY), tr = loadJSON(TRIAL_KEY);
     var plays = 0, wins = 0; Object.keys(st).forEach(function(k){ plays += st[k].play; wins += st[k].win; });
