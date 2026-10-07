@@ -1,4 +1,4 @@
-var CACHE = 'norikae-transfer-v3';
+var CACHE = 'norikae-transfer-v4';
 var ASSETS = [
   './',
   './index.html',

@@ -245,9 +245,25 @@
   }
 
   /* ===== 描画 ===== */
+  /* この要素より下に並んでいるものの高さの合計（凡例やボタンなど） */
+  function spaceBelow(el){
+    var after = 0, node = el;
+    while(node && node !== document.body){
+      for(var sib = node.nextElementSibling; sib; sib = sib.nextElementSibling) after += sib.offsetHeight;
+      node = node.parentElement;
+    }
+    return after;
+  }
   function fitCanvas(cv){
-    var dpr = window.devicePixelRatio || 1, w = cv.clientWidth || 360, h = w*H/W;
-    cv.style.height = h+'px';
+    var dpr = window.devicePixelRatio || 1;
+    cv.style.width = '';                       // いったんCSS任せに戻してから測る
+    var w = cv.clientWidth || 360;
+    // 表示枠に残っている高さに収まるよう、必要なら地図を縮める
+    // 24px は要素間の余白ぶんの余裕（offsetHeight には margin が含まれないため）
+    var avail = window.innerHeight - cv.getBoundingClientRect().top - spaceBelow(cv) - 24;
+    if(avail > 120 && w*H/W > avail) w = Math.floor(avail*W/H);
+    var h = w*H/W;
+    cv.style.width = w+'px'; cv.style.height = h+'px';
     cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
     var ctx = cv.getContext('2d');
     ctx.setTransform(cv.width/W, 0, 0, cv.height/H, 0, 0);
